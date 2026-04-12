@@ -113,7 +113,15 @@ router.put("/:id", function (req, res, next) {
       if (results.affectedRows === 0) {
         return res.status(404).json({ error: "Plant not found" });
       }
-      res.json({ message: "Plant updated successfully" });
+      res.status(201).json({
+        message: "Plant updated successfully",
+        id: plantId,
+        name,
+        species,
+        watering_frequency_days,
+        date_created: now,
+        date_updated: now,
+      });
     },
   );
 });
