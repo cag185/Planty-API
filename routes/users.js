@@ -3,6 +3,7 @@ var express = require("express");
 var router = express.Router();
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const SALT_ROUNDS = 10;
 
@@ -43,7 +44,49 @@ router.get("/:id", function (req, res, next) {
   );
 });
 
-// Create a new user
+// Login
+router.post("/login", function (req, res, next) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "email and password are required" });
+  }
+
+  connection.query(
+    "SELECT * FROM users_user WHERE email = ?",
+    [email],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      if (results.length === 0) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      const user = results[0];
+
+      bcrypt.compare(password, user.password, function (err, match) {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+        if (!match) {
+          return res.status(401).json({ error: "Invalid email or password" });
+        }
+
+        const token = jwt.sign(
+          { id: user.id, email: user.email },
+          process.env.JWT_SECRET,
+          { expiresIn: "7d" },
+        );
+
+        const { password: _removed, ...userInfo } = user;
+        res.json({ token, user: userInfo });
+      });
+    },
+  );
+});
+
+// Create a new user (signup)
 router.post("/", function (req, res, next) {
   const { name, email, password } = req.body;
 
