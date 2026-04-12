@@ -1,0 +1,139 @@
+require("dotenv").config();
+var express = require("express");
+var router = express.Router();
+const mysql = require("mysql2");
+
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+connection.connect();
+
+// Get all plants
+router.get("/", function (req, res, next) {
+  connection.query("SELECT * FROM plants_plant", function (error, results) {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    res.json(results);
+  });
+});
+
+// Get a specific plant by id
+router.get("/:id", function (req, res, next) {
+  const plantId = req.params.id;
+  connection.query(
+    "SELECT * FROM plants_plant WHERE id = ?",
+    [plantId],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Plant not found" });
+      }
+      res.json(results[0]);
+    },
+  );
+});
+
+// Create a new plant
+router.post("/", function (req, res, next) {
+  const { name, species, watering_frequency_days } = req.body;
+
+  if (!name || !species || !watering_frequency_days) {
+    return res.status(400).json({
+      error: "name, species, and watering_frequency_days are required",
+    });
+  }
+
+  const now = new Date();
+  connection.query(
+    "INSERT INTO plants_plant (date_created, date_deleted, date_updated, name, species, watering_frequency_days) VALUES (?, NULL, ?, ?, ?, ?)",
+    [now, now, name, species, watering_frequency_days],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      res.status(201).json({
+        id: results.insertId,
+        name,
+        species,
+        watering_frequency_days,
+        date_created: now,
+        date_updated: now,
+      });
+    },
+  );
+});
+
+// Edit an existing plant
+router.put("/:id", function (req, res, next) {
+  const plantId = req.params.id;
+  const { name, species, watering_frequency_days } = req.body;
+
+  if (!name && !species && !watering_frequency_days) {
+    return res.status(400).json({
+      error:
+        "At least one field (name, species, watering_frequency_days) is required",
+    });
+  }
+
+  const fields = [];
+  const values = [];
+
+  if (name) {
+    fields.push("name = ?");
+    values.push(name);
+  }
+  if (species) {
+    fields.push("species = ?");
+    values.push(species);
+  }
+  if (watering_frequency_days) {
+    fields.push("watering_frequency_days = ?");
+    values.push(watering_frequency_days);
+  }
+
+  const now = new Date();
+  fields.push("date_updated = ?");
+  values.push(now);
+  values.push(plantId);
+
+  connection.query(
+    "UPDATE plants_plant SET " + fields.join(", ") + " WHERE id = ?",
+    values,
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Plant not found" });
+      }
+      res.json({ message: "Plant updated successfully" });
+    },
+  );
+});
+
+// Delete a plant
+router.delete("/:id", function (req, res, next) {
+  const plantId = req.params.id;
+  connection.query(
+    "DELETE FROM plants_plant WHERE id = ?",
+    [plantId],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Plant not found" });
+      }
+      res.json({ message: "Plant deleted successfully" });
+    },
+  );
+});
+
+module.exports = router;
