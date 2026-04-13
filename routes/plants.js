@@ -22,6 +22,23 @@ router.get("/", function (req, res, next) {
   });
 });
 
+// Get all plants from a specific user.
+router.get("/user/", function (req, res) {
+  const userId = req.query.user_id;
+  connection.query(
+    `SELECT * FROM plants_plant JOIN users_to_plants
+     ON users_to_plants.plants_plant_id = plants_plant.id 
+     WHERE users_to_plants.users_user_id = ?`,
+    [userId],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      res.json(results);
+    },
+  );
+});
+
 // Get a specific plant by id
 router.get("/:id", function (req, res, next) {
   const plantId = req.params.id;
@@ -36,23 +53,6 @@ router.get("/:id", function (req, res, next) {
         return res.status(404).json({ error: "Plant not found" });
       }
       res.json(results[0]);
-    },
-  );
-});
-
-// Get all plants from a specific user.
-router.get("/plants/:userId", function (req, res, next) {
-  const userId = req.params.userId;
-  connection.query(
-    `SELECT * FROM plants_plant JOIN users_to_plants
-     ON users_to_plants.plants_plant_id = plants_plant.id 
-     WHERE users_to_plants.users_user_id = ?`,
-    [userId],
-    function (error, results) {
-      if (error) {
-        return res.status(500).json({ error: error.message });
-      }
-      res.json(results);
     },
   );
 });
