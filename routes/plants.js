@@ -59,11 +59,11 @@ router.get("/plants/:userId", function (req, res, next) {
 
 // Create a new plant
 router.post("/", function (req, res, next) {
-  const { name, species, watering_frequency_days, userId } = req.body;
+  const { name, species, watering_frequency_days, user_id } = req.body;
 
-  if (!name || !species || !watering_frequency_days || !userId) {
+  if (!name || !species || !watering_frequency_days || !user_id) {
     return res.status(400).json({
-      error: "name, species, watering_frequency_days, and userId are required",
+      error: "name, species, watering_frequency_days, and user_id are required",
     });
   }
 
@@ -79,7 +79,7 @@ router.post("/", function (req, res, next) {
       // Now insert into users_to_plants
       connection.query(
         "INSERT INTO users_to_plants (users_user_id, plants_plant_id) VALUES (?, ?)",
-        [userId, plantId],
+        [user_id, plantId],
         function (linkError) {
           if (linkError) {
             return res.status(500).json({ error: linkError.message });
@@ -91,7 +91,7 @@ router.post("/", function (req, res, next) {
             watering_frequency_days,
             date_created: now,
             date_updated: now,
-            userId,
+            user_id,
           });
         },
       );
