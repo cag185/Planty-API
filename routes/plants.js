@@ -40,13 +40,30 @@ router.get("/:id", function (req, res, next) {
   );
 });
 
+// Get all plants from a specific user.
+router.get("/plants/:userId", function (req, res, next) {
+  const userId = req.params.userId;
+  connection.query(
+    `SELECT * FROM plants_plant JOIN users_to_plants
+     ON users_to_plants.plants_plant_id = plants_plant.id 
+     WHERE users_to_plants.users_user_id = ?`,
+    [userId],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      res.json(results);
+    },
+  );
+});
+
 // Create a new plant
 router.post("/", function (req, res, next) {
-  const { name, species, watering_frequency_days } = req.body;
+  const { name, species, watering_frequency_days, userId } = req.body;
 
-  if (!name || !species || !watering_frequency_days) {
+  if (!name || !species || !watering_frequency_days || !userId) {
     return res.status(400).json({
-      error: "name, species, and watering_frequency_days are required",
+      error: "name, species, watering_frequency_days, and userId are required",
     });
   }
 
@@ -58,14 +75,26 @@ router.post("/", function (req, res, next) {
       if (error) {
         return res.status(500).json({ error: error.message });
       }
-      res.status(201).json({
-        id: results.insertId,
-        name,
-        species,
-        watering_frequency_days,
-        date_created: now,
-        date_updated: now,
-      });
+      const plantId = results.insertId;
+      // Now insert into users_to_plants
+      connection.query(
+        "INSERT INTO users_to_plants (users_user_id, plants_plant_id) VALUES (?, ?)",
+        [userId, plantId],
+        function (linkError) {
+          if (linkError) {
+            return res.status(500).json({ error: linkError.message });
+          }
+          res.status(201).json({
+            id: plantId,
+            name,
+            species,
+            watering_frequency_days,
+            date_created: now,
+            date_updated: now,
+            userId,
+          });
+        },
+      );
     },
   );
 });
