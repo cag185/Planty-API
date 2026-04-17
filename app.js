@@ -46,8 +46,13 @@ app.use(function (err, req, res, next) {
 
 // Set up the database connection.
 const mysql = require("mysql2");
-
-const connection = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  port: process.env.DB_PORT,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 console.log("DB CONFIG:", {
   host: process.env.DB_HOST,
