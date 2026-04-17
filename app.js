@@ -45,7 +45,7 @@ app.use(function (err, req, res, next) {
 });
 
 //set the port number
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
