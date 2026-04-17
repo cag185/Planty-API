@@ -44,12 +44,6 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-//set the port number
-const port = process.env.PORT;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
 // Set up the database connection.
 const mysql = require("mysql2");
 const connection = mysql.createConnection({
