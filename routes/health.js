@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET health page. */
 router.get("/", function (req, res, next) {
-  res.json({ ok: true });
+  res.render("health", { title: "Health check passed" });
 });
 
 module.exports = router;
