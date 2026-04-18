@@ -31,14 +31,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/plants", plantsRouter);
+// app.use("/users", usersRouter);
+// app.use("/plants", plantsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
+// health endpoint.
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
+});
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
