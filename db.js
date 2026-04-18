@@ -1,3 +1,50 @@
+// require("dotenv").config();
+// const mysql = require("mysql2");
+
+// const db = {
+//   connection: null,
+// };
+
+// function connectToDB() {
+//   db.connection = mysql.createConnection({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     port: Number(process.env.DB_PORT),
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_NAME,
+//     ssl: {
+//       rejectUnauthorized: false,
+//     },
+//   });
+
+//   db.connection.connect((err) => {
+//     if (err) {
+//       console.error("DB connection error:", err);
+//       setTimeout(connectToDB, 5000);
+//     } else {
+//       console.log("DB connected");
+//     }
+//   });
+
+//   db.connection.on("error", (err) => {
+//     console.error("MySQL runtime error:", err);
+//     if (
+//       err.code === "PROTOCOL_CONNECTION_LOST" ||
+//       err.code === "ECONNRESET" ||
+//       err.code === "ETIMEDOUT"
+//     ) {
+//       console.log("Reconnecting to DB...");
+//       connectToDB();
+//     } else {
+//       throw err;
+//     }
+//   });
+// }
+
+// connectToDB();
+
+// module.exports = db;
+
 require("dotenv").config();
 const mysql = require("mysql2");
 
@@ -6,10 +53,12 @@ const db = {
 };
 
 function connectToDB() {
+  console.log("Attempting DB connection...");
+
   db.connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    port: Number(process.env.DB_PORT),
+    port: Number(process.env.DB_PORT || 3306),
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     ssl: {
@@ -21,13 +70,15 @@ function connectToDB() {
     if (err) {
       console.error("DB connection error:", err);
       setTimeout(connectToDB, 5000);
-    } else {
-      console.log("DB connected");
+      return;
     }
+
+    console.log("DB connected");
   });
 
   db.connection.on("error", (err) => {
     console.error("MySQL runtime error:", err);
+
     if (
       err.code === "PROTOCOL_CONNECTION_LOST" ||
       err.code === "ECONNRESET" ||
@@ -36,11 +87,9 @@ function connectToDB() {
       console.log("Reconnecting to DB...");
       connectToDB();
     } else {
-      throw err;
+      console.error("Non-recoverable DB error:", err);
     }
   });
 }
-
-connectToDB();
 
 module.exports = db;
