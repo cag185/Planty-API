@@ -5,7 +5,7 @@ var express = require("express");
 var app = express();
 app.use(
   cors({
-    origin: ["https://plantyv1.netlify.app"],
+    origin: "https://plantyv1.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
