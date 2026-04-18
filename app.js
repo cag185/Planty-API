@@ -3,6 +3,11 @@ var cors = require("cors");
 var express = require("express");
 
 var app = express();
+// Log the incoming Origin header for every request
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  next();
+});
 app.use(cors());
 app.options("*", cors());
 
