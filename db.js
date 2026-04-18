@@ -66,14 +66,19 @@ function connectToDB() {
     },
   });
 
-  db.connection.connect((err) => {
-    if (err) {
-      console.error("DB connection error:", err);
+  db.connection.connect((error) => {
+    if (error) {
+      console.error("DB connection error:", error);
       setTimeout(connectToDB, 5000);
       return;
     }
 
-    console.log("DB connected");
+    console.log(`DB connected with stats:
+        Host: ${db.connection.config.host}
+        User: ${db.connection.config.user}
+        Database: ${db.connection.config.database}
+        Port: ${db.connection.config.port}
+    `);
   });
 
   db.connection.on("error", (err) => {
