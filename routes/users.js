@@ -1,24 +1,15 @@
 require("dotenv").config();
 var express = require("express");
 var router = express.Router();
-const mysql = require("mysql2");
+const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const SALT_ROUNDS = 10;
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-connection.connect();
-
 // Get all users
 router.get("/", function (req, res, next) {
-  connection.query("SELECT * FROM users_user", function (error, results) {
+  db.connection.query("SELECT * FROM users_user", function (error, results) {
     if (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -29,7 +20,7 @@ router.get("/", function (req, res, next) {
 // Get a specific user by id
 router.get("/:id", function (req, res, next) {
   const userId = req.params.id;
-  connection.query(
+  db.connection.query(
     "SELECT * FROM users_user WHERE id = ?",
     [userId],
     function (error, results) {
@@ -52,7 +43,7 @@ router.post("/login", function (req, res, next) {
     return res.status(400).json({ error: "email and password are required" });
   }
 
-  connection.query(
+  db.connection.query(
     "SELECT * FROM users_user WHERE email = ?",
     [email],
     function (error, results) {
@@ -91,11 +82,13 @@ router.post("/", function (req, res, next) {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ error: "name, email, and password are required" });
+    return res
+      .status(400)
+      .json({ error: "name, email, and password are required" });
   }
 
   // Check if email and password combination is already in use
-  connection.query(
+  db.connection.query(
     "SELECT id FROM users_user WHERE email = ?",
     [email],
     function (error, results) {
@@ -103,7 +96,9 @@ router.post("/", function (req, res, next) {
         return res.status(500).json({ error: error.message });
       }
       if (results.length > 0) {
-        return res.status(409).json({ error: "A user with this email already exists" });
+        return res
+          .status(409)
+          .json({ error: "A user with this email already exists" });
       }
 
       bcrypt.hash(password, SALT_ROUNDS, function (err, hashedPassword) {
@@ -112,14 +107,22 @@ router.post("/", function (req, res, next) {
         }
 
         const now = new Date();
-        connection.query(
+        db.connection.query(
           "INSERT INTO users_user (date_created, date_deleted, date_updated, name, email, password) VALUES (?, NULL, ?, ?, ?, ?)",
           [now, now, name, email, hashedPassword],
           function (error, results) {
             if (error) {
               return res.status(500).json({ error: error.message });
             }
-            res.status(201).json({ id: results.insertId, name, email, date_created: now, date_updated: now });
+            res
+              .status(201)
+              .json({
+                id: results.insertId,
+                name,
+                email,
+                date_created: now,
+                date_updated: now,
+              });
           },
         );
       });
@@ -133,7 +136,11 @@ router.put("/:id", function (req, res, next) {
   const { name, email, password } = req.body;
 
   if (!name && !email && !password) {
-    return res.status(400).json({ error: "At least one field (name, email, password) is required" });
+    return res
+      .status(400)
+      .json({
+        error: "At least one field (name, email, password) is required",
+      });
   }
 
   const fields = [];
@@ -157,7 +164,7 @@ router.put("/:id", function (req, res, next) {
     const allValues = values.concat(extraValues);
     allValues.push(userId);
 
-    connection.query(
+    db.connection.query(
       "UPDATE users_user SET " + allFields.join(", ") + " WHERE id = ?",
       allValues,
       function (error, results) {
@@ -187,7 +194,7 @@ router.put("/:id", function (req, res, next) {
 // Delete a user
 router.delete("/:id", function (req, res, next) {
   const userId = req.params.id;
-  connection.query(
+  db.connection.query(
     "DELETE FROM users_user WHERE id = ?",
     [userId],
     function (error, results) {

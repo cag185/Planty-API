@@ -44,33 +44,4 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-// Set up the database connection.
-
-const mysql = require("mysql2");
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  port: Number(process.env.DB_PORT),
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
-
-console.log("DB CONFIG:", {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  database: process.env.DB_NAME,
-});
-
-connection.connect((err) => {
-  if (err) {
-    console.error("DB connection error:", err);
-  } else {
-    console.log("DB connected");
-  }
-});
-
 module.exports = app;
