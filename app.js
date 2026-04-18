@@ -45,13 +45,17 @@ app.use(function (err, req, res, next) {
 });
 
 // Set up the database connection.
+
 const mysql = require("mysql2");
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 console.log("DB CONFIG:", {
@@ -61,7 +65,12 @@ console.log("DB CONFIG:", {
   database: process.env.DB_NAME,
 });
 
-connection.connect();
-connection.end();
+connection.connect((err) => {
+  if (err) {
+    console.error("DB connection error:", err);
+  } else {
+    console.log("DB connected");
+  }
+});
 
 module.exports = app;
