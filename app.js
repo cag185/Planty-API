@@ -3,13 +3,7 @@ var cors = require("cors");
 var express = require("express");
 
 var app = express();
-app.use(
-  cors({
-    origin: "https://plantyv1.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+app.use(cors());
 app.options("*", cors());
 
 var createError = require("http-errors");
