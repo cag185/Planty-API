@@ -12,7 +12,13 @@ var usersRouter = require("./routes/users");
 var plantsRouter = require("./routes/plants");
 
 var app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://plantyv1.netlify.app", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
