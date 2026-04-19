@@ -20,6 +20,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var plantsRouter = require("./routes/plants");
 var healthRouter = require("./routes/health");
+var notificationsRouter = require("./routes/notifications");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -35,7 +36,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/plants", plantsRouter);
 app.use("/health", healthRouter);
-
+app.use("/notifications", notificationsRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
