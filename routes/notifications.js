@@ -20,13 +20,20 @@ router.get("/", function (req, res) {
 
 // Create a new notification for a user.
 router.post("/create", function (req, res) {
-  const { title, message, users_user_id, plants_plant_id } = req.body;
-  if (!title || !message || !users_user_id || !plants_plant_id) {
+  const { title, message, users_user_id, plant_id, notification_type_id } =
+    req.body;
+  if (
+    !title ||
+    !message ||
+    !users_user_id ||
+    !plant_id ||
+    !notification_type_id
+  ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   db.connection.query(
-    `INSERT INTO notifications_notification (title, message, users_user_id, plants_plant_id) VALUES (?, ?, ?, ?)`,
-    [title, message, users_user_id, plants_plant_id],
+    `INSERT INTO notifications_notification (title, message, users_user_id, plant_id, notification_type_id) VALUES (?, ?, ?, ?, ?)`,
+    [title, message, users_user_id, plant_id, notification_type_id],
     function (error, results) {
       if (error) {
         console.error("Error creating new notification:", error);
@@ -37,7 +44,8 @@ router.post("/create", function (req, res) {
         title,
         message,
         users_user_id,
-        plants_plant_id,
+        plant_id,
+        notification_type_id,
       });
     },
   );
@@ -45,8 +53,8 @@ router.post("/create", function (req, res) {
 
 // Mark a notification as completed. Also will Acknowledge it as well.
 router.post("/complete", function (req, res) {
-  const notificationId = req.body.notification_id;
-  if (!notificationId) {
+  const { notification_id } = req.body;
+  if (!notification_id) {
     return res.status(400).json({ error: "notification_id is required" });
   }
   db.connection.query(
@@ -56,7 +64,7 @@ router.post("/complete", function (req, res) {
     date_completed = NOW(),
     date_acknowledged = NOW()
     WHERE id = ?`,
-    [notificationId],
+    [notification_id],
     function (error, results) {
       if (error) {
         console.error("Error marking notification as completed:", error);
@@ -69,8 +77,9 @@ router.post("/complete", function (req, res) {
 
 // Mark a notification as acknowledged.
 router.post("/acknowledge", function (req, res) {
-  const notificationId = req.body.notification_id;
-  if (!notificationId) {
+  const { notification_id } = req.body;
+  console.log(req.body);
+  if (!notification_id) {
     return res.status(400).json({ error: "notification_id is required" });
   }
   db.connection.query(
@@ -78,7 +87,7 @@ router.post("/acknowledge", function (req, res) {
     SET acknowledged = TRUE,
     date_acknowledged = NOW()
     WHERE id = ?`,
-    [notificationId],
+    [notification_id],
     function (error, results) {
       if (error) {
         console.error("Error marking notification as acknowledged:", error);
