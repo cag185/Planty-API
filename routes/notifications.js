@@ -43,4 +43,50 @@ router.post("/create", function (req, res) {
   );
 });
 
+// Mark a notification as completed. Also will Acknowledge it as well.
+router.post("/complete", function (req, res) {
+  const notificationId = req.body.notification_id;
+  if (!notificationId) {
+    return res.status(400).json({ error: "notification_id is required" });
+  }
+  db.connection.query(
+    `UPDATE notifications_notification 
+    SET completed = TRUE, 
+    acknowledged = TRUE,
+    date_completed = NOW(),
+    date_acknowledged = NOW()
+    WHERE id = ?`,
+    [notificationId],
+    function (error, results) {
+      if (error) {
+        console.error("Error marking notification as completed:", error);
+        return res.status(500).json({ error: error.message });
+      }
+      res.json({ success: true });
+    },
+  );
+});
+
+// Mark a notification as acknowledged.
+router.post("/acknowledge", function (req, res) {
+  const notificationId = req.body.notification_id;
+  if (!notificationId) {
+    return res.status(400).json({ error: "notification_id is required" });
+  }
+  db.connection.query(
+    `UPDATE notifications_notification
+    SET acknowledged = TRUE,
+    date_acknowledged = NOW()
+    WHERE id = ?`,
+    [notificationId],
+    function (error, results) {
+      if (error) {
+        console.error("Error marking notification as acknowledged:", error);
+        return res.status(500).json({ error: error.message });
+      }
+      res.json({ success: true });
+    },
+  );
+});
+
 module.exports = router;
