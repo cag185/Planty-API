@@ -75,6 +75,30 @@ router.post("/complete", function (req, res) {
   );
 });
 
+// Mark all user notifications as completed. Also will Acknowledge them as well.
+router.post("/complete-all", function (req, res) {
+  const { user_id } = req.body;
+  if (!user_id) {
+    return res.status(400).json({ error: "user_id is required" });
+  }
+  db.connection.query(
+    `UPDATE notifications_notification 
+    SET completed = TRUE, 
+    acknowledged = TRUE,
+    date_completed = NOW(),
+    date_acknowledged = NOW()
+    WHERE users_user_id = ?`,
+    [user_id],
+    function (error, results) {
+      if (error) {
+        console.error("Error marking notifications as completed:", error);
+        return res.status(500).json({ error: error.message });
+      }
+      res.json({ success: true });
+    },
+  );
+});
+
 // Mark a notification as acknowledged.
 router.post("/acknowledge", function (req, res) {
   const { notification_id } = req.body;
@@ -91,6 +115,28 @@ router.post("/acknowledge", function (req, res) {
     function (error, results) {
       if (error) {
         console.error("Error marking notification as acknowledged:", error);
+        return res.status(500).json({ error: error.message });
+      }
+      res.json({ success: true });
+    },
+  );
+});
+
+// Mark all user notifications as acknowledged.
+router.post("/acknowledge-all", function (req, res) {
+  const { user_id } = req.body;
+  if (!user_id) {
+    return res.status(400).json({ error: "user_id is required" });
+  }
+  db.connection.query(
+    `UPDATE notifications_notification
+      SET acknowledged = TRUE,
+      date_acknowledged = NOW()
+      WHERE users_user_id = ?`,
+    [user_id],
+    function (error, results) {
+      if (error) {
+        console.error("Error marking notifications as acknowledged:", error);
         return res.status(500).json({ error: error.message });
       }
       res.json({ success: true });
