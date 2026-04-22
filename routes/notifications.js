@@ -76,7 +76,7 @@ router.post("/complete", function (req, res) {
 });
 
 // Mark all user notifications as completed. Also will Acknowledge them as well.
-router.post("/complete_all", function (req, res) {
+router.post("/complete-all", function (req, res) {
   const { user_id } = req.body;
   if (!user_id) {
     return res.status(400).json({ error: "user_id is required" });
@@ -123,7 +123,7 @@ router.post("/acknowledge", function (req, res) {
 });
 
 // Mark all user notifications as acknowledged.
-router.post("/acknowledge_all", function (req, res) {
+router.post("/acknowledge-all", function (req, res) {
   const { user_id } = req.body;
   if (!user_id) {
     return res.status(400).json({ error: "user_id is required" });
