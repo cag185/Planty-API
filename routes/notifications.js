@@ -2,9 +2,10 @@ require("dotenv").config();
 var express = require("express");
 var router = express.Router();
 const db = require("../db");
+const authenticateToken = require("../middleware/auth");
 
 // Get the notifications that belong to a user.
-router.get("/", function (req, res) {
+router.get("/", authenticateToken, function (req, res) {
   const userId = req.query.user_id;
   db.connection.query(
     `SELECT * FROM notifications_notification WHERE users_user_id = ?`,
@@ -19,7 +20,7 @@ router.get("/", function (req, res) {
 });
 
 // Create a new notification for a user.
-router.post("/create", function (req, res) {
+router.post("/create", authenticateToken, function (req, res) {
   const { title, message, users_user_id, plant_id, notification_type_id } =
     req.body;
   if (
@@ -52,7 +53,7 @@ router.post("/create", function (req, res) {
 });
 
 // Mark a notification as completed. Also will Acknowledge it as well.
-router.post("/complete", function (req, res) {
+router.post("/complete", authenticateToken, function (req, res) {
   const { notification_id } = req.body;
   if (!notification_id) {
     return res.status(400).json({ error: "notification_id is required" });
@@ -76,7 +77,7 @@ router.post("/complete", function (req, res) {
 });
 
 // Mark all user notifications as completed. Also will Acknowledge them as well.
-router.post("/complete-all", function (req, res) {
+router.post("/complete-all", authenticateToken, function (req, res) {
   const { user_id } = req.body;
   if (!user_id) {
     return res.status(400).json({ error: "user_id is required" });
@@ -100,7 +101,7 @@ router.post("/complete-all", function (req, res) {
 });
 
 // Mark a notification as acknowledged.
-router.post("/acknowledge", function (req, res) {
+router.post("/acknowledge", authenticateToken, function (req, res) {
   const { notification_id } = req.body;
   console.log(req.body);
   if (!notification_id) {
@@ -123,7 +124,7 @@ router.post("/acknowledge", function (req, res) {
 });
 
 // Mark all user notifications as acknowledged.
-router.post("/acknowledge-all", function (req, res) {
+router.post("/acknowledge-all", authenticateToken, function (req, res) {
   const { user_id } = req.body;
   if (!user_id) {
     return res.status(400).json({ error: "user_id is required" });

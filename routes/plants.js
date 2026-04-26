@@ -2,9 +2,10 @@ require("dotenv").config();
 var express = require("express");
 var router = express.Router();
 const db = require("../db");
+const authenticateToken = require("../middleware/auth");
 
 // Get all plants
-router.get("/", function (req, res, next) {
+router.get("/", authenticateToken, function (req, res, next) {
   db.connection.query("SELECT * FROM plants_plant", function (error, results) {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -14,7 +15,7 @@ router.get("/", function (req, res, next) {
 });
 
 // Get all plants from a specific user.
-router.get("/user/", function (req, res) {
+router.get("/user/", authenticateToken, function (req, res) {
   const userId = req.query.user_id;
   db.connection.query(
     `SELECT * FROM plants_plant JOIN users_to_plants
@@ -31,7 +32,7 @@ router.get("/user/", function (req, res) {
 });
 
 // Get a specific plant by id
-router.get("/:id", function (req, res, next) {
+router.get("/:id", authenticateToken, function (req, res, next) {
   const plantId = req.params.id;
   db.connection.query(
     "SELECT * FROM plants_plant WHERE id = ?",
@@ -49,7 +50,7 @@ router.get("/:id", function (req, res, next) {
 });
 
 // Create a new plant
-router.post("/", function (req, res, next) {
+router.post("/", authenticateToken, function (req, res, next) {
   const { name, species, watering_frequency_days, user_id } = req.body;
 
   if (!name || !species || !watering_frequency_days || !user_id) {
@@ -91,7 +92,7 @@ router.post("/", function (req, res, next) {
 });
 
 // Edit an existing plant
-router.put("/:id", function (req, res, next) {
+router.put("/:id", authenticateToken, function (req, res, next) {
   const plantId = req.params.id;
   const { name, species, watering_frequency_days } = req.body;
 
@@ -147,7 +148,7 @@ router.put("/:id", function (req, res, next) {
 });
 
 // Delete a plant
-router.delete("/:id", function (req, res, next) {
+router.delete("/:id", authenticateToken, function (req, res, next) {
   const plantId = req.params.id;
   db.connection.query(
     "DELETE FROM plants_plant WHERE id = ?",
