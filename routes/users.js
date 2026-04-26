@@ -4,11 +4,12 @@ var router = express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const authenticateToken = require("../middleware/auth");
 
 const SALT_ROUNDS = 10;
 
 // Get all users
-router.get("/", function (req, res, next) {
+router.get("/", authenticateToken, function (req, res, next) {
   db.connection.query("SELECT * FROM users_user", function (error, results) {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -18,7 +19,7 @@ router.get("/", function (req, res, next) {
 });
 
 // Get a specific user by id
-router.get("/:id", function (req, res, next) {
+router.get("/:id", authenticateToken, function (req, res, next) {
   const userId = req.params.id;
   db.connection.query(
     "SELECT * FROM users_user WHERE id = ?",
@@ -67,7 +68,7 @@ router.post("/login", function (req, res, next) {
         const token = jwt.sign(
           { id: user.id, email: user.email },
           process.env.JWT_SECRET,
-          { expiresIn: "7d" },
+          { expiresIn: "1h" },
         );
 
         const { password: _removed, ...userInfo } = user;
@@ -114,15 +115,13 @@ router.post("/", function (req, res, next) {
             if (error) {
               return res.status(500).json({ error: error.message });
             }
-            res
-              .status(201)
-              .json({
-                id: results.insertId,
-                name,
-                email,
-                date_created: now,
-                date_updated: now,
-              });
+            res.status(201).json({
+              id: results.insertId,
+              name,
+              email,
+              date_created: now,
+              date_updated: now,
+            });
           },
         );
       });
@@ -131,16 +130,14 @@ router.post("/", function (req, res, next) {
 });
 
 // Edit an existing user
-router.put("/:id", function (req, res, next) {
+router.put("/:id", authenticateToken, function (req, res, next) {
   const userId = req.params.id;
   const { name, email, password } = req.body;
 
   if (!name && !email && !password) {
-    return res
-      .status(400)
-      .json({
-        error: "At least one field (name, email, password) is required",
-      });
+    return res.status(400).json({
+      error: "At least one field (name, email, password) is required",
+    });
   }
 
   const fields = [];
@@ -192,7 +189,7 @@ router.put("/:id", function (req, res, next) {
 });
 
 // Delete a user
-router.delete("/:id", function (req, res, next) {
+router.delete("/:id", authenticateToken, function (req, res, next) {
   const userId = req.params.id;
   db.connection.query(
     "DELETE FROM users_user WHERE id = ?",
