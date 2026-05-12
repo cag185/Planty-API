@@ -15,6 +15,7 @@ function connectToDB() {
     ssl: {
       rejectUnauthorized: false,
     },
+    enableKeepAlive: true,
   });
 
   db.connection.connect((err) => {
