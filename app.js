@@ -53,4 +53,6 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
+// Import the cron job and run it at the correct intervals.
+
 module.exports = app;

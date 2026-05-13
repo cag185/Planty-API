@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node -r tsx/cjs ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -16,6 +16,15 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "~1.9.1",
-    "mysql2": "^3.22.0"
+    "mysql2": "^3.22.0",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.7.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }
