@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "name": "Debug Planty API",
+            "request": "launch",
+            "runtimeArgs": ["-r", "tsx/cjs"],
+            "program": "${workspaceFolder}/bin/www",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "sourceMaps": true,
+            "skipFiles": ["<node_internals>/**", "node_modules/**"],
+            "breakOnError": false
+        }
+    ]
+}

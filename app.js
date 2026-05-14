@@ -53,4 +53,8 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
+// Import the cron job and run it at the correct intervals.
+const { notificationCronJob } = require("./cron-jobs/notification-cron-job");
+notificationCronJob.start();
+
 module.exports = app;
