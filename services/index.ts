@@ -1,3 +1,3 @@
-export * as PlantService from "./plantService";
-export * as UserService from "./userService";
-export * as NotificationService from "./notificationService";
+export * as plantService from "./plantService";
+export * as userService from "./userService";
+export * as notificationService from "./notificationService";
