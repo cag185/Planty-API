@@ -6,9 +6,9 @@ import { CreateNotificationRequest } from "../requests/NotificationRequests";
 import { userService } from "../services";
 
 // For now this will load all the plants in the system and check if any are due to be watered. If so, create a notification for the user.
-// Runs daily at 08:00:00 am.
-// Testing time for every minute: "* * * * *"
-export const notificationCronJob = cron.schedule("* * * * *", async () => {
+// Runs daily at 08:00:00 am. - cron.schedule("0 8 * * *"
+// Testing time for every minute - 0 * * * * *
+export const notificationCronJob = cron.schedule("0 8 * * *", async () => {
   console.log("Running notification cron job...");
 
   // Load in the plants.
