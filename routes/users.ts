@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
-import authenticateToken from "../middleware/auth";
+const authenticateToken = require("../middleware/auth") as (req: Request, res: Response, next: () => void) => void;
 import * as userService from "../services/userService";
 
 const router = express.Router();

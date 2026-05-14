@@ -83,6 +83,29 @@ export const completeNotification = async (
   req: CompleteNotificationRequest
 ): Promise<boolean> => {
   validateCompleteNotificationRequest(req);
+
+  // Check if the notification to complete is about watering a plant.
+  // Note - this is for requirement notifications where the tracking depends on a user not the autonomous system.
+  if (req.isForWatering) {
+    // validate that we have a non null plant id.
+    if (!req.plant_id) {
+      throw new Error("plant_id is required when completing a watering notification");
+    }
+
+    // If so, we need to also update the last_watered date for the plant.
+    const plantResult = await execute(
+      `UPDATE plants_plant
+       SET last_date_watered = NOW()
+       WHERE id = (SELECT plant_id FROM notifications_notification WHERE id = ?)`,
+      [req.plant_id]
+    )
+
+    if(!plantResult.affectedRows) {
+      throw new Error("Failed to update plant's last watered date");
+    }
+  }
+
+  // Fall through should update the notification in the db as complete.
   const result = await execute(
     `UPDATE notifications_notification
      SET completed = TRUE,
