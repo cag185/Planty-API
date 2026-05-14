@@ -66,6 +66,16 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
   return rows[0] ?? null;
 };
 
+export const getUserByPlantId = async (plantId: number): Promise<User | null> => {
+  const rows = await query<User>(
+    `SELECT users_user.* FROM users_user
+     JOIN users_to_plants ON users_to_plants.users_user_id = users_user.id
+     WHERE users_to_plants.plants_plant_id = ?`,
+    [plantId]
+  );
+  return rows[0] ?? null;
+};
+
 export const loginUser = async (
   req: LoginUserRequest
 ): Promise<LoginResult> => {

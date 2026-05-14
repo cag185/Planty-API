@@ -44,7 +44,8 @@ export const getPlantById = async (id: number): Promise<Plant | null> => {
 
 export const getPlantsByUserId = async (userId: number): Promise<Plant[]> => {
   return query<Plant>(
-    `SELECT * FROM plants_plant
+    `SELECT plants_plant.*
+     FROM plants_plant
      JOIN users_to_plants ON users_to_plants.plants_plant_id = plants_plant.id
      WHERE users_to_plants.users_user_id = ?`,
     [userId]
@@ -76,6 +77,7 @@ export const createPlant = async (
     date_created: now,
     date_deleted: null,
     date_updated: now,
+    date_last_watered: null,
   };
 };
 

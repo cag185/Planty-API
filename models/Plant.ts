@@ -6,4 +6,5 @@ export interface Plant {
   name: string;
   species: string;
   watering_frequency_days: number;
+  date_last_watered: Date | null;
 }

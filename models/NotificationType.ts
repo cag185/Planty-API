@@ -5,3 +5,6 @@ export interface NotificationType {
   date_updated: Date;
   name: string;
 }
+
+// Type 1 - update
+// Type 2 - requirement reminder
