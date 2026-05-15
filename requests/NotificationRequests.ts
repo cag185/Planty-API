@@ -8,6 +8,8 @@ export interface CreateNotificationRequest {
 
 export interface CompleteNotificationRequest {
   notification_id: number;
+  isForWatering: boolean;
+  plant_id?: number;
 }
 
 export interface CompleteAllNotificationsRequest {

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
-import authenticateToken from "../middleware/auth";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const authenticateToken = require("../middleware/auth") as (req: Request, res: Response, next: () => void) => void;
 import * as notificationService from "../services/notificationService";
 
 const router = express.Router();
@@ -38,6 +39,8 @@ router.post("/complete", authenticateToken, async (req: Request, res: Response) 
   try {
     await notificationService.completeNotification({
       notification_id: req.body.notification_id,
+      isForWatering: req.body.isForWatering,
+      plant_id: req.body.plant_id,
     });
     res.json({ success: true });
   } catch (error) {
