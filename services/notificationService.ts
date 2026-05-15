@@ -93,16 +93,18 @@ export const completeNotification = async (
     }
 
     // If so, we need to also update the last_watered date for the plant.
+    // @todo - this should be in the plant service.
     const plantResult = await execute(
       `UPDATE plants_plant
-       SET last_date_watered = NOW()
-       WHERE id = (SELECT plant_id FROM notifications_notification WHERE id = ?)`,
+       SET date_last_watered = NOW()
+       WHERE id = ?`,
       [req.plant_id]
     )
 
     if(!plantResult.affectedRows) {
       throw new Error("Failed to update plant's last watered date");
     }
+    console.log(`Updated plant ${req.plant_id} last watered date due to completion of watering notification ${req.notification_id}`);
   }
 
   // Fall through should update the notification in the db as complete.
@@ -115,6 +117,7 @@ export const completeNotification = async (
      WHERE id = ?`,
     [req.notification_id]
   );
+  console.log(`Completed notification ${req.notification_id} with result:`, result);
   return result.affectedRows > 0;
 };
 

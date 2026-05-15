@@ -39,7 +39,7 @@ router.post("/complete", authenticateToken, async (req: Request, res: Response) 
   try {
     await notificationService.completeNotification({
       notification_id: req.body.notification_id,
-      isForWatering: req.body.isForWatering = false,
+      isForWatering: req.body.isForWatering,
       plant_id: req.body.plant_id,
     });
     res.json({ success: true });
