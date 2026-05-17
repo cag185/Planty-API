@@ -1,4 +1,5 @@
 import { query, execute } from "./db-helpers";
+import { getIO } from "./socket";
 import { Notification } from "../models";
 import {
   CreateNotificationRequest,
@@ -76,7 +77,15 @@ export const createNotification = async (
     [result.insertId]
   );
 
-  return rows[0];
+  // Push the new notification to the user's socket room.
+  const notification = rows[0];
+  try {
+    getIO().to(`user:${req.users_user_id}`).emit("notification:new", notification);
+  } catch (err) {
+    console.warn("[socket.io] Could not emit notification:new –", err);
+  }
+
+  return notification;
 };
 
 export const completeNotification = async (
