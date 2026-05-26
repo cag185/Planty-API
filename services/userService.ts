@@ -170,3 +170,21 @@ export const deleteUser = async (req: DeleteUserRequest): Promise<boolean> => {
   );
   return result.affectedRows > 0;
 };
+
+// Create a service method to enable email notifiations for a user.
+export const enableEmailNotifications = async (userId: number): Promise<boolean> => {
+  const result = await execute(
+    "UPDATE users_user SET enabled_email_notifications = TRUE WHERE id = ?",
+    [userId]
+  );
+  return result.affectedRows > 0;
+};
+
+// Create a service method to disable email notifiations for a user.
+export const disableEmailNotifications = async (userId: number): Promise<boolean> => {
+  const result = await execute(
+    "UPDATE users_user SET enabled_email_notifications = FALSE WHERE id = ?",
+    [userId]
+  );
+  return result.affectedRows > 0;
+};
