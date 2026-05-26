@@ -19,3 +19,8 @@ export interface LoginUserRequest {
   email: string;
   password: string;
 }
+
+export interface UpdateUserSettingsRequest {
+  id: number;
+  emailNotificationsEnabled?: boolean;
+}

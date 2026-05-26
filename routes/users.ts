@@ -116,4 +116,20 @@ router.post("/:id/disable-notifications", authenticateToken, async (req: Request
   }
 });
 
+// Update the user settings that come in from the request.
+router.post("/:id/update-settings", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const updated = await userService.updateUserSettings({
+      id: Number(req.params.id),
+      emailNotificationsEnabled: req.body.emailNotificationsEnabled,
+    });
+    if (!updated) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ message: "User settings updated successfully" });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
 export = router;

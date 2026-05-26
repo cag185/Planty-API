@@ -3,6 +3,7 @@ import { User } from "../models";
 import {
   CreateUserRequest,
   UpdateUserRequest,
+  UpdateUserSettingsRequest,
   DeleteUserRequest,
   LoginUserRequest,
 } from "../requests";
@@ -187,4 +188,17 @@ export const disableEmailNotifications = async (userId: number): Promise<boolean
     [userId]
   );
   return result.affectedRows > 0;
+};
+
+// Service method that udpates the fields on the user settings request.
+export const updateUserSettings = async (req: UpdateUserSettingsRequest): Promise<boolean> => {
+  if (req.id != 0) {
+    const result = await execute(
+      "UPDATE users_user SET enabled_email_notifications = ? WHERE id = ?",
+      [req.emailNotificationsEnabled, req.id]
+    );
+    return result.affectedRows > 0;
+  } else {
+    throw new Error("No valid settings provided to update");
+  }
 };
