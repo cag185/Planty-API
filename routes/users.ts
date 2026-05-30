@@ -126,7 +126,7 @@ router.post("/:id/update-settings", authenticateToken, async (req: Request, res:
     if (!updated) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.json({ message: "User settings updated successfully" });
+    res.json({ message: "User settings updated successfully", user: updated });
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
   }
