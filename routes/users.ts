@@ -90,4 +90,46 @@ router.delete("/:id", authenticateToken, async (req: Request, res: Response) => 
   }
 });
 
+// Enable a user's email notifications.
+router.post("/:id/enable-notifications", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const enabled = await userService.enableEmailNotifications(Number(req.params.id));
+    if (!enabled) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ message: "Email notifications enabled" });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+// Disable a user's email notifications.
+router.post("/:id/disable-notifications", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const disabled = await userService.disableEmailNotifications(Number(req.params.id));
+    if (!disabled) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ message: "Email notifications disabled" });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+// Update the user settings that come in from the request.
+router.post("/:id/update-settings", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const updated = await userService.updateUserSettings({
+      id: Number(req.params.id),
+      emailNotificationsEnabled: req.body.emailNotificationsEnabled,
+    });
+    if (!updated) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ message: "User settings updated successfully", user: updated });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
 export = router;

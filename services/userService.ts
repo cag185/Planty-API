@@ -3,6 +3,7 @@ import { User } from "../models";
 import {
   CreateUserRequest,
   UpdateUserRequest,
+  UpdateUserSettingsRequest,
   DeleteUserRequest,
   LoginUserRequest,
 } from "../requests";
@@ -169,4 +170,41 @@ export const deleteUser = async (req: DeleteUserRequest): Promise<boolean> => {
     [req.id]
   );
   return result.affectedRows > 0;
+};
+
+// Create a service method to enable email notifiations for a user.
+export const enableEmailNotifications = async (userId: number): Promise<boolean> => {
+  const result = await execute(
+    "UPDATE users_user SET enabled_email_notifications = TRUE WHERE id = ?",
+    [userId]
+  );
+  return result.affectedRows > 0;
+};
+
+// Create a service method to disable email notifiations for a user.
+export const disableEmailNotifications = async (userId: number): Promise<boolean> => {
+  const result = await execute(
+    "UPDATE users_user SET enabled_email_notifications = FALSE WHERE id = ?",
+    [userId]
+  );
+  return result.affectedRows > 0;
+};
+
+// Service method that udpates the fields on the user settings request.
+export const updateUserSettings = async (req: UpdateUserSettingsRequest): Promise<User> => {
+  if (req.id != 0) {
+    const result = await execute(
+      "UPDATE users_user SET enabled_email_notifications = ? WHERE id = ?",
+      [req.emailNotificationsEnabled, req.id]
+    );
+    if (result.affectedRows > 0) {
+      const updatedUser = await getUserById(req.id);
+      if (updatedUser) {
+        return updatedUser;
+      }
+    }
+    throw new Error("Failed to update user settings");
+  } else {
+    throw new Error("No valid settings provided to update");
+  }
 };
