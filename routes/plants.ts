@@ -63,6 +63,7 @@ router.put("/:id", authenticateToken, async (req: Request, res: Response) => {
       name: req.body.name,
       species: req.body.species,
       watering_frequency_days: req.body.watering_frequency_days,
+      date_last_watered: req.body.date_last_watered,
     });
     if (!updated) {
       return res.status(404).json({ error: "Plant not found" });
