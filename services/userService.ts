@@ -9,6 +9,7 @@ import {
 } from "../requests";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { deletePlantsForUser } from "./plantService";
 
 const SALT_ROUNDS = 10;
 
@@ -164,6 +165,9 @@ export const updateUser = async (
 };
 
 export const deleteUser = async (req: DeleteUserRequest): Promise<boolean> => {
+  // Delete the plants associated with this user before deleting the user itself.
+  await deletePlantsForUser(req.id);
+
   validateDeleteUserRequest(req);
   const result = await execute(
     "DELETE FROM users_user WHERE id = ?",

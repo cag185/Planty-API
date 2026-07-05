@@ -173,3 +173,14 @@ export const acknowledgeAllNotifications = async (
   );
   return result.affectedRows > 0;
 };
+
+// Service call to delete all notifications connected to a plant.
+export const deleteNotificationsForPlant = async (
+  plantId: number
+): Promise<boolean> => {
+  const result = await execute(
+    `DELETE FROM notifications_notification WHERE plant_id = ?`,
+    [plantId]
+  );
+  return result.affectedRows > 0;
+};

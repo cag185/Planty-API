@@ -5,6 +5,7 @@ import {
   UpdatePlantRequest,
   DeletePlantRequest,
 } from "../requests";
+import { deleteNotificationsForPlant } from "./notificationService";
 
 const validateCreatePlantRequest = (req: CreatePlantRequest): void => {
   const missing: string[] = [];
@@ -124,10 +125,25 @@ export const updatePlant = async (
 };
 
 export const deletePlant = async (req: DeletePlantRequest): Promise<boolean> => {
+  // Have to find all notifications that belong to this plant and delete them as well.
+  await deleteNotificationsForPlant(req.id);
+
   validateDeletePlantRequest(req);
   const result = await execute(
     "DELETE FROM plants_plant WHERE id = ?",
     [req.id]
   );
   return result.affectedRows > 0;
+};
+
+// A function to delete all the plants that belong to a user.
+export const deletePlantsForUser = async (userId: number): Promise<boolean> => {
+  // Retrieve all the plants that belong to the user so we can delete them one by one.
+  const plantsToDelete = await getPlantsByUserId(userId);
+
+  // Delete each plant using the plant delete function which handles orphaned notifications.
+  for (const plant of plantsToDelete) {
+    await deletePlant({ id: plant.id });
+  }
+  return true;
 };
