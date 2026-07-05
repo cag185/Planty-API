@@ -103,10 +103,11 @@ export const updatePlant = async (
   // If we want to update the last date the plant was waterd.
   if (req.date_last_watered)
   {
+    // Convert the string to a date.
+    const rawDate = new Date(req.date_last_watered);
     fields.push("date_last_watered = ?");
-    // Convert the string into a valid date that can be used in the database.
-    const dateLastWatered = new Date(req.date_last_watered);
-    values.push(dateLastWatered);
+    const formattedDate = rawDate.toISOString().slice(0, 19).replace('T', ' ');
+    values.push(formattedDate);
   }
 
   const now = new Date();
