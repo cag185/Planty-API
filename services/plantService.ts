@@ -19,9 +19,9 @@ const validateCreatePlantRequest = (req: CreatePlantRequest): void => {
 
 const validateUpdatePlantRequest = (req: UpdatePlantRequest): void => {
   if (!req.id) throw new Error("id is required");
-  if (!req.name && !req.species && !req.watering_frequency_days) {
+  if (!req.name && !req.species && !req.watering_frequency_days && !req.date_last_watered) {
     throw new Error(
-      "At least one field (name, species, watering_frequency_days) is required"
+      "At least one field (name, species, watering_frequency_days, date_last_watered) is required"
     );
   }
 };
@@ -99,6 +99,14 @@ export const updatePlant = async (
   if (req.watering_frequency_days) {
     fields.push("watering_frequency_days = ?");
     values.push(req.watering_frequency_days);
+  }
+  // If we want to update the last date the plant was waterd.
+  if (req.date_last_watered)
+  {
+    fields.push("date_last_watered = ?");
+    // Convert the string into a valid date that can be used in the database.
+    const dateLastWatered = new Date(req.date_last_watered);
+    values.push(dateLastWatered);
   }
 
   const now = new Date();

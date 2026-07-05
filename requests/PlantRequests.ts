@@ -10,6 +10,7 @@ export interface UpdatePlantRequest {
   name?: string;
   species?: string;
   watering_frequency_days?: number;
+  date_last_watered?: string;
 }
 
 export interface DeletePlantRequest {
