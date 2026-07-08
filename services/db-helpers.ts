@@ -1,19 +1,9 @@
-const db = require( "../db");
+import { pool } from "../db";
+import type { RowDataPacket, ResultSetHeader } from "mysql2";
 
-/**
- * Promise wrapper around the existing db.connection.query callback API.
- * Returns typed rows from SELECT queries.
- */
-export const query = <T>(sql: string, params?: unknown[]): Promise<T[]> => {
-  return new Promise((resolve, reject) => {
-    db.connection.query(sql, params, (error: Error | null, results: T[]) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(results);
-      }
-    });
-  });
+export const query = async <T>(sql: string, params?: unknown[]): Promise<T[]> => {
+  const [rows] = await pool.query<RowDataPacket[]>(sql, params as unknown[]);
+  return rows as unknown as T[];
 };
 
 interface MutationResult {
@@ -21,24 +11,10 @@ interface MutationResult {
   affectedRows: number;
 }
 
-/**
- * Promise wrapper for INSERT/UPDATE/DELETE queries.
- */
-export const execute = (
+export const execute = async (
   sql: string,
   params?: unknown[]
 ): Promise<MutationResult> => {
-  return new Promise((resolve, reject) => {
-    db.connection.query(
-      sql,
-      params,
-      (error: Error | null, results: MutationResult) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      }
-    );
-  });
+  const [result] = await pool.query<ResultSetHeader>(sql, params as unknown[]);
+  return { insertId: result.insertId, affectedRows: result.affectedRows };
 };
