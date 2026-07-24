@@ -104,7 +104,7 @@ export const loginUser = async (
 
 export const createUser = async (
   req: CreateUserRequest
-): Promise<Omit<User, "password">> => {
+): Promise<LoginResult> => {
   validateCreateUserRequest(req);
   const existing = await getUserByEmail(req.email);
   if (existing) {
@@ -120,7 +120,7 @@ export const createUser = async (
     [now, now, req.name, req.email, hashedPassword]
   );
 
-  return {
+  const userInfo: Omit<User, "password"> = {
     id: result.insertId,
     name: req.name,
     email: req.email,
@@ -128,6 +128,14 @@ export const createUser = async (
     date_deleted: null,
     date_updated: now,
   };
+
+  const token = jwt.sign(
+    { id: result.insertId, email: req.email },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "1h" }
+  );
+
+  return { token, user: userInfo };
 };
 
 export const updateUser = async (
