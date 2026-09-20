@@ -21,6 +21,7 @@ var usersRouter = require("./routes/users");
 var plantsRouter = require("./routes/plants");
 var healthRouter = require("./routes/health");
 var notificationsRouter = require("./routes/notifications");
+var testRouter = require("./routes/test");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -37,6 +38,9 @@ app.use("/users", usersRouter);
 app.use("/plants", plantsRouter);
 app.use("/health", healthRouter);
 app.use("/notifications", notificationsRouter);
+// Local dev tooling for previewing and smoke-testing emails. Always 404s in
+// production – see routes/test.ts.
+app.use("/test", testRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

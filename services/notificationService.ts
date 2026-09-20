@@ -1,6 +1,7 @@
 import { query, execute } from "./db-helpers";
 import { getIO } from "./socket";
-import { Notification } from "../models";
+import { sendNotificationEmail } from "./emailService";
+import { Notification, User } from "../models";
 import {
   CreateNotificationRequest,
   CompleteNotificationRequest,
@@ -85,7 +86,48 @@ export const createNotification = async (
     console.warn("[socket.io] Could not emit notification:new –", err);
   }
 
+  // Mirror the notification to the user's inbox, if they've opted in.
+  await emailNotificationIfEnabled(notification);
+
   return notification;
+};
+
+/**
+ * Sends the notification by email when the recipient has email notifications
+ * turned on in their settings.
+ *
+ * The user is loaded here rather than through userService to avoid a require
+ * cycle (userService -> plantService -> notificationService). Failures are
+ * logged and swallowed so a mail problem can never fail the notification write.
+ */
+const emailNotificationIfEnabled = async (
+  notification: Notification
+): Promise<void> => {
+  try {
+    const users = await query<User>(
+      "SELECT * FROM users_user WHERE id = ? AND date_deleted IS NULL",
+      [notification.users_user_id]
+    );
+    const user = users[0];
+
+    if (!user) {
+      console.warn(
+        `[email] No user ${notification.users_user_id} for notification ${notification.id} – skipping email.`
+      );
+      return;
+    }
+
+    // enabled_email_notifications is a tinyint(1), so this is 0/1 rather than a
+    // real boolean coming out of MySQL.
+    if (!user.enabled_email_notifications) return;
+
+    await sendNotificationEmail(notification, user);
+  } catch (err) {
+    console.error(
+      `[email] Could not email notification ${notification.id} –`,
+      err
+    );
+  }
 };
 
 export const completeNotification = async (
