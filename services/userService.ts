@@ -127,6 +127,8 @@ export const createUser = async (
     date_created: now,
     date_deleted: null,
     date_updated: now,
+    // Matches the column default; users opt in from their settings page.
+    enabled_email_notifications: false,
   };
 
   const token = jwt.sign(

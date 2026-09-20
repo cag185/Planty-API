@@ -6,4 +6,6 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  // Stored as a tinyint(1) in MySQL, so this arrives as 0/1 rather than a real boolean.
+  enabled_email_notifications: boolean;
 }
