@@ -9,7 +9,8 @@ import { userService } from "../services";
 // Runs daily at 08:00:00 am. - cron.schedule("0 8 * * *"
 // Testing time for every minute - 0 * * * * *
 // Adjusted to UTC for server jobs. - 0 12 * * *
-export const notificationCronJob = cron.schedule("0 12 * * *", async () => {
+// Test in prod for 11 am in utc. -  0 16 * * *
+export const notificationCronJob = cron.schedule("0 16 * * *", async () => {
   console.log("Running notification cron job...");
 
   // Load in the plants.
